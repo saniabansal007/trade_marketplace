@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Chat with {{ other_user.username }} - Agora of Olympus{% endblock %}
+
+{% block content %}
+<div class="row">
+
+    <!-- ===== USER SIDEBAR ===== -->
+    <div class="col-md-3">
+        <div class="card shadow text-center p-3">
+            <img src="{{ url_for('static', filename='uploads/avatars/' + other_user.avatar) }}"
+                 class="rounded-circle mb-3"
+                 style="width:100px;height:100px;object-fit:cover;"
+                 onerror="this.src='https://via.placeholder.com/100'">
+            <h5>{{ other_user.username }}</h5>
+            <small class="text-muted">Member since {{ other_user.created_at.strftime('%B %Y') }}</small>
+        </div>
+
+        {% if item %}
+        <div class="card shadow mt-3 p-2">
+            <img src="{{ url_for('static', filename='uploads/items/' + item.image) }}"
+                 class="img-fluid rounded mb-2">
+            <strong>{{ item.name }}</strong>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ===== CHAT PANEL ===== -->
+    <div class="col-md-9">
+        <div class="card shadow" style="height:600px;display:flex;flex-direction:column;">
+
+            <div class="card-header bg-primary text-white">
+                Chat with {{ other_user.username }}
+            </div>
+
+            <div class="card-body" id="chatMessages" style="flex:1;overflow-y:auto;">
+                <div id="messagesContainer">
+                    {% for msg in messages %}
+                    <div class="mb-2 text-{{ 'end' if msg.sender_id == current_user.id else 'start' }}">
+                        <span class="badge bg-{{ 'primary' if msg.sender_id == current_user.id else 'secondary' }}">
+                            {{ msg.content }}
+                        </span><br>
+                        <small class="text-muted">{{ msg.timestamp.strftime('%H:%M') }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <div id="typingIndicator" class="small text-muted mb-1" style="display:none;">
+                    {{ other_user.username }} is typing...
+                </div>
+
+                <form id="messageForm" class="d-flex gap-2">
+                    <input id="messageInput" class="form-control" required autocomplete="off">
+                    <button class="btn btn-primary">Send</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ===== SAFE DATA INJECTION (NO JS ERRORS) ===== -->
+<div id="chat-data"
+     data-current-user-id="{{ current_user.id }}"
+     data-other-user-id="{{ other_user.id }}"
+     data-current-username="{{ current_user.username }}"
+     data-other-username="{{ other_user.username }}"
+     data-item-id="{{ item.id if item else '' }}">
+</div>
+
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+/* ===== READ DATA SAFELY ===== */
+const chatData = document.getElementById('chat-data').dataset;
+
+const currentUserId = Number(chatData.currentUserId);
+const otherUserId = Number(chatData.otherUserId);
+const room = `chat_${Math.min(currentUserId, otherUserId)}_${Math.max(currentUserId, otherUserId)}`;
+
+/* ===== SOCKET ===== */
+const socket = io();
+let typingTimeout;
+
+socket.on('connect', () => {
+    socket.emit('join_chat', { room });
+});
+
+socket.on('receive_message', data => {
+    if (data.sender_id !== currentUserId) {
+        addMessage(data.content, false);
+    }
+});
+
+socket.on('user_typing', () => {
+    document.getElementById('typingIndicator').style.display = 'block';
+});
+
+socket.on('user_stop_typing', () => {
+    document.getElementById('typingIndicator').style.display = 'none';
+});
+
+/* ===== SEND MESSAGE ===== */
+document.getElementById('messageForm').addEventListener('submit', e => {
+    e.preventDefault();
+
+    const input = document.getElementById('messageInput');
+    if (!input.value.trim()) return;
+
+    socket.emit('send_message', {
+        room,
+        recipient_id: otherUserId,
+        content: input.value
+    });
+
+    addMessage(input.value, true);
+    input.value = '';
+});
+
+/* ===== TYPING ===== */
+document.getElementById('messageInput').addEventListener('input', () => {
+    socket.emit('typing', { room });
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+        socket.emit('stop_typing', { room });
+    }, 800);
+});
+
+/* ===== UI HELPERS ===== */
+function addMessage(text, sent) {
+    const div = document.createElement('div');
+    div.className = `mb-2 text-${sent ? 'end' : 'start'}`;
+    div.innerHTML = `
+        <span class="badge bg-${sent ? 'primary' : 'secondary'}">${escapeHtml(text)}</span>
+    `;
+    document.getElementById('messagesContainer').appendChild(div);
+}
+
+function escapeHtml(text) {
+    const d = document.createElement('div');
+    d.textContent = text;
+    return d.innerHTML;
+}
+</script>
+{% endblock %}

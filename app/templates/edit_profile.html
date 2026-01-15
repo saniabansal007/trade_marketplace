@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - Agora of Olympus{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="mb-4"><i class="bi bi-pencil-square"></i> Edit Profile</h2>
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <img src="{{ url_for('static', filename='uploads/avatars/' + current_user.avatar) }}" 
+                         alt="{{ current_user.username }}" 
+                         class="rounded-circle mb-3" 
+                         style="width: 150px; height: 150px; object-fit: cover;"
+                         onerror="this.src='https://via.placeholder.com/150?text={{ current_user.username[0] }}'">
+                    <p class="text-muted">Current Profile Picture</p>
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.avatar.label(class="form-label") }}
+                        {{ form.avatar(class="form-control") }}
+                        {% if form.avatar.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.avatar.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="text-muted">Recommended: Square image (200x200px). Max 5MB.</small>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Update Profile
+                        </button>
+                        <a href="{{ url_for('main.profile', username=current_user.username) }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

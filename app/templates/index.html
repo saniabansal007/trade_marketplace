@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded-3 mb-4">
+    <h1 class="display-4 text-center">Welcome to Agora of Olympus</h1>
+    <p class="lead text-center">The legendary marketplace where heroes trade mythical items!</p>
+    <hr class="my-4">
+    <div class="text-center">
+        <a class="btn btn-primary btn-lg me-2" href="{{ url_for('main.marketplace') }}">
+            <i class="bi bi-grid-3x3-gap"></i> Browse Marketplace
+        </a>
+        {% if not current_user.is_authenticated %}
+            <a class="btn btn-outline-secondary btn-lg" href="{{ url_for('auth.register') }}">
+                <i class="bi bi-person-plus"></i> Join Now
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+{% if items %}
+<h2 class="mb-4">Recent Listings</h2>
+<div class="row g-4">
+    {% for item in items %}
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <span class="badge rarity-{{ item.rarity }} mb-2">{{ item.rarity.title() }}</span>
+                <span class="badge bg-secondary mb-2">{{ item.category.title() }}</span>
+                <h5 class="card-title mt-2">{{ item.name }}</h5>
+                <p class="card-text text-muted">{{ item.description[:100] }}...</p>
+            </div>
+            <div class="card-footer bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="bi bi-person"></i> {{ item.seller.username }}
+                    </small>
+                    <a href="{{ url_for('main.item_detail', item_id=item.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info text-center">
+    <h4>No items yet!</h4>
+    <p>Be the first hero to list a mythical item.</p>
+</div>
+{% endif %}
+{% endblock %}

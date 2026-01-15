@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.name }} - Agora of Olympus{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <img src="{{ url_for('static', filename='uploads/items/' + item.image) }}" class="card-img-top"
+                alt="{{ item.name }}" style="max-height: 400px; object-fit: contain; background-color: #21262d;"
+                onerror="if(this.src!='https://via.placeholder.com/800x400?text=No+Image')this.src='https://via.placeholder.com/800x400?text=No+Image';">
+
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h2>{{ item.name }}</h2>
+                        <span class="badge rarity-{{ item.rarity }} me-2">{{ item.rarity.title() }}</span>
+                        <span class="badge bg-secondary">{{ item.category.title() }}</span>
+                    </div>
+
+                    {% if current_user.is_authenticated and current_user.id == item.seller_id %}
+                    <div class="btn-group">
+                        <a href="{{ url_for('main.edit_item', item_id=item.id) }}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#deleteModal">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="alert alert-light">
+                    <h5>Description</h5>
+                    <p style="white-space: pre-wrap;">{{ item.description }}</p>
+                </div>
+
+                <p class="text-muted">
+                    <small><i class="bi bi-calendar"></i> Listed on {{ item.created_at.strftime('%B %d, %Y') }}</small>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <h5 class="card-title">Seller Information</h5>
+                <div class="text-center mb-3">
+                    <img src="{{ url_for('static', filename='uploads/avatars/' + item.seller.avatar) }}"
+                        alt="{{ item.seller.username }}" class="rounded-circle"
+                        style="width: 80px; height: 80px; object-fit: cover;"
+                        onerror="if(this.src!='https://via.placeholder.com/80?text=User')this.src='https://via.placeholder.com/80?text=User';">
+                </div>
+                <p><strong>Username:</strong> <a href="{{ url_for('main.profile', username=item.seller.username) }}">{{
+                        item.seller.username }}</a></p>
+                <p><strong>Email:</strong> {{ item.seller.email }}</p>
+                <p><strong>Member since:</strong> {{ item.seller.created_at.strftime('%B %Y') }}</p>
+
+                {% if current_user.is_authenticated and current_user.id != item.seller_id %}
+                <hr>
+                <a href="{{ url_for('main.chat', other_user_id=item.seller.id, item_id=item.id) }}"
+                    class="btn btn-success w-100">
+                    <i class="bi bi-chat-dots"></i> Chat with Seller
+                </a>
+                {% elif not current_user.is_authenticated %}
+                <hr>
+                <p class="text-muted small text-center">
+                    <a href="{{ url_for('auth.login') }}">Login</a> to contact seller
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{{ url_for('main.marketplace') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Marketplace
+    </a>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong>{{ item.name }}</strong>?</p>
+                <p class="text-danger"><i class="bi bi-exclamation-triangle"></i> This action cannot be undone!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="POST" action="{{ url_for('main.delete_item', item_id=item.id) }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Delete Item
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

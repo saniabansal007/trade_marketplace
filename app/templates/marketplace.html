@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Marketplace - Agora of Olympus{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-grid-3x3-gap"></i> Marketplace</h1>
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('main.create_item') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> List New Item
+    </a>
+    {% endif %}
+</div>
+
+<!-- Filters Card -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('main.marketplace') }}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label"><i class="bi bi-search"></i> Search</label>
+                    <input type="text" name="search" class="form-control" placeholder="Search items..."
+                        value="{{ search }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><i class="bi bi-tag"></i> Category</label>
+                    <select name="category" class="form-select">
+                        <option value="all" {% if category=='all' %}selected{% endif %}>All Categories</option>
+                        <option value="weapon" {% if category=='weapon' %}selected{% endif %}>Weapon</option>
+                        <option value="armor" {% if category=='armor' %}selected{% endif %}>Armor</option>
+                        <option value="potion" {% if category=='potion' %}selected{% endif %}>Potion</option>
+                        <option value="artifact" {% if category=='artifact' %}selected{% endif %}>Artifact</option>
+                        <option value="scroll" {% if category=='scroll' %}selected{% endif %}>Scroll</option>
+                        <option value="jewel" {% if category=='jewel' %}selected{% endif %}>Jewel</option>
+                        <option value="other" {% if category=='other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><i class="bi bi-star"></i> Rarity</label>
+                    <select name="rarity" class="form-select">
+                        <option value="all" {% if rarity=='all' %}selected{% endif %}>All Rarities</option>
+                        <option value="common" {% if rarity=='common' %}selected{% endif %}>Common</option>
+                        <option value="uncommon" {% if rarity=='uncommon' %}selected{% endif %}>Uncommon</option>
+                        <option value="rare" {% if rarity=='rare' %}selected{% endif %}>Rare</option>
+                        <option value="epic" {% if rarity=='epic' %}selected{% endif %}>Epic</option>
+                        <option value="legendary" {% if rarity=='legendary' %}selected{% endif %}>Legendary</option>
+                        <option value="mythical" {% if rarity=='mythical' %}selected{% endif %}>Mythical</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-funnel"></i> Filter
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Items Grid -->
+{% if items.items %}
+<div class="row g-4 mb-4">
+    {% for item in items.items %}
+    <div class="col-md-4 col-lg-3">
+        <div class="card h-100 shadow-sm">
+            <img src="{{ url_for('static', filename='uploads/items/' + item.image) }}" class="card-img-top"
+                alt="{{ item.name }}"
+                style="height: 200px; object-fit: contain; background-color: #21262d;"
+                onerror="this.src='https://via.placeholder.com/400x200?text={{ item.name }}'">
+            <div class="card-body">
+                <span class="badge rarity-{{ item.rarity }} mb-2">{{ item.rarity.title() }}</span>
+                <span class="badge bg-secondary mb-2">{{ item.category.title() }}</span>
+                <h5 class="card-title mt-2">{{ item.name }}</h5>
+                <p class="card-text text-muted small">{{ item.description[:80] }}...</p>
+            </div>
+            <div class="card-footer bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="bi bi-person"></i> <a
+                            href="{{ url_for('main.profile', username=item.seller.username) }}">{{ item.seller.username
+                            }}</a>
+                    </small>
+                    <a href="{{ url_for('main.item_detail', item_id=item.id) }}"
+                        class="btn btn-sm btn-outline-primary">View</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if items.pages > 1 %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if items.has_prev %}
+        <li class="page-item">
+            <a class="page-link"
+                href="{{ url_for('main.marketplace', page=items.prev_num, category=category, rarity=rarity, search=search) }}">Previous</a>
+        </li>
+        {% endif %}
+
+        {% for page_num in items.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if page_num %}
+        {% if page_num == items.page %}
+        <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
+        {% else %}
+        <li class="page-item"><a class="page-link"
+                href="{{ url_for('main.marketplace', page=page_num, category=category, rarity=rarity, search=search) }}">{{
+                page_num }}</a></li>
+        {% endif %}
+        {% else %}
+        <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+        {% endif %}
+        {% endfor %}
+
+        {% if items.has_next %}
+        <li class="page-item">
+            <a class="page-link"
+                href="{{ url_for('main.marketplace', page=items.next_num, category=category, rarity=rarity, search=search) }}">Next</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="alert alert-info text-center mt-4">
+    <h4>No items found</h4>
+    <p>Try adjusting your filters or be the first to list an item!</p>
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('main.create_item') }}" class="btn btn-primary">List Your First Item</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Agora of Olympus{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        /* Dark Theme Colors */
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --border-color: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-purple: #bc8cff;
+            --accent-green: #3fb950;
+        }
+
+        /* Make body flex container */
+        html, body {
+            height: 100%;
+            margin: 0;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Main content grows to fill space */
+        main {
+            flex: 1 0 auto;
+        }
+        
+        /* Footer stays at bottom */
+        footer {
+            flex-shrink: 0;
+        }
+
+        /* Navbar Dark Theme */
+        .navbar-dark {
+            background-color: var(--bg-secondary) !important;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Card Dark Theme */
+        .card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .card-header {
+            background-color: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-footer {
+            background-color: var(--bg-tertiary);
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Form Controls Dark Theme */
+        .form-control, .form-select {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: var(--bg-tertiary);
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.25rem rgba(88, 166, 255, 0.25);
+        }
+
+        /* Alert Dark Theme */
+        .alert-light {
+            background-color: var(--bg-tertiary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .alert-info {
+            background-color: #1f2937;
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        /* Links */
+        a {
+            color: var(--accent-blue);
+        }
+
+        a:hover {
+            color: var(--accent-purple);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: #238636;
+            border-color: #238636;
+        }
+
+        .btn-primary:hover {
+            background-color: #2ea043;
+            border-color: #2ea043;
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-tertiary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-secondary);
+            border-color: var(--accent-blue);
+        }
+
+        .btn-success {
+            background-color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .btn-outline-primary {
+            color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--accent-blue);
+            color: #0d1117;
+        }
+
+        /* Rarity badge colors - Enhanced for dark theme */
+        .rarity-common { 
+            background-color: #6c757d;
+            color: white;
+        }
+        .rarity-uncommon { 
+            background-color: #28a745;
+            color: white;
+        }
+        .rarity-rare { 
+            background-color: #007bff;
+            color: white;
+        }
+        .rarity-epic { 
+            background-color: #9b59b6;
+            color: white;
+        }
+        .rarity-legendary { 
+            background-color: #ff6b6b;
+            color: white;
+        }
+        .rarity-mythical { 
+            background-color: #ffd700;
+            color: #000;
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--bg-secondary) !important;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+        }
+
+        .dropdown-item {
+            color: var(--text-primary);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--bg-secondary);
+            color: var(--accent-blue);
+        }
+
+        .dropdown-divider {
+            border-top-color: var(--border-color);
+        }
+
+        /* List Group (for messages) */
+        .list-group-item {
+            background-color: var(--bg-secondary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .list-group-item:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        .list-group-item.active {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        /* Modal */
+        .modal-content {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header, .modal-footer {
+            border-color: var(--border-color);
+        }
+
+        /* Pagination */
+        .pagination .page-link {
+            background-color: var(--bg-tertiary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .pagination .page-link:hover {
+            background-color: var(--bg-secondary);
+            color: var(--accent-blue);
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #0d1117;
+        }
+
+        /* Text colors */
+        .text-muted {
+            color: var(--text-secondary) !important;
+        }
+
+        /* Jumbotron/Hero Section */
+        .jumbotron, .bg-light {
+            background-color: var(--bg-tertiary) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Table */
+        .table {
+            color: var(--text-primary);
+        }
+
+        .table-striped > tbody > tr:nth-of-type(odd) > * {
+            background-color: var(--bg-tertiary);
+        }
+
+        /* Image thumbnails */
+        .img-thumbnail {
+            background-color: var(--bg-tertiary);
+            border-color: var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">
+                <i class="bi bi-shop"></i> Agora of Olympus
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.marketplace') }}">
+                            <i class="bi bi-grid-3x3-gap"></i> Marketplace
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.create_item') }}">
+                                <i class="bi bi-plus-circle"></i> List Item
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="{{ url_for('main.inbox') }}">
+                                <i class="bi bi-envelope"></i> Messages
+                                {% if current_user.unread_message_count() > 0 %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        {{ current_user.unread_message_count() }}
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> {{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ url_for('main.profile', username=current_user.username) }}">
+                                    <i class="bi bi-person"></i> My Profile
+                                </a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.edit_profile') }}">
+                                    <i class="bi bi-pencil"></i> Edit Profile
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.login') }}">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.register') }}">
+                                <i class="bi bi-person-plus"></i> Register
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- GLOBAL BACK BUTTON -->
+    <div class="container mt-3">
+        <button onclick="window.history.back()" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back
+        </button>
+    </div>
+
+
+
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="container my-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p class="mb-0">&copy;Agora of Olympus</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
