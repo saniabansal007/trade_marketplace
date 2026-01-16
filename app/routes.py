@@ -28,7 +28,6 @@ def save_picture(form_picture, folder, size=(500, 500)):
     
     return picture_fn
 
-# ===== MAIN ROUTES =====
 @main.route('/')
 def index():
     items = Item.query.order_by(Item.created_at.desc()).limit(6).all()
@@ -43,7 +42,6 @@ def marketplace():
     
     query = Item.query
     
-    # Apply filters
     if category != 'all':
         query = query.filter_by(category=category)
     if rarity != 'all':
@@ -137,7 +135,6 @@ def delete_item(item_id):
     flash('Item deleted successfully.', 'success')
     return redirect(url_for('main.marketplace'))
 
-# ===== USER PROFILE ROUTES =====
 @main.route('/profile/<username>')
 def profile(username):
     user = User.query.filter_by(username=username).first_or_404()
@@ -162,7 +159,6 @@ def edit_profile():
     
     return render_template('edit_profile.html', form=form)
 
-# ===== MESSAGING ROUTES =====
 @main.route('/messages/inbox')
 @login_required
 def inbox():
@@ -245,7 +241,6 @@ def delete_message(message_id):
     flash('Message deleted.', 'success')
     return redirect(url_for('main.inbox'))
 
-# ===== AUTH ROUTES =====
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
