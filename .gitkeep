@@ -1,0 +1,3 @@
+# Create placeholder files for empty directories
+touch app/static/uploads/items/.gitkeep
+touch app/static/uploads/avatars/.gitkeep
