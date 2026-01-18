@@ -16,3 +16,10 @@ class Config:
     UPLOAD_FOLDER = os.path.join(basedir, 'app/static/uploads')
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+
+
+SQLALCHEMY_DATABASE_URI = os.environ.get(
+    "postgresql://trading_marketplace_user:d5S2zmge0HqPOxR8tGq4RLCHJ8Nrtvfd@dpg-d5mbm5coud1c7398qfl0-a/trading_marketplace",
+    "sqlite:///site.db"
+)
